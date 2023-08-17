@@ -1,0 +1,6 @@
+bind_addr = ":8080"
+log_level = "error"
+
+[store]
+database_url = "host=localhost dbname=restapi_test user=user password=secret sslmode=disable"
+#docker run --rm -e POSTGRES_PASSWORD=secret -e POSTGRES_USER=user -e POSTGRES_DB=restapi_dev --name=pg -p 5432:5432 -v pgdb:/var/lib/postgresql/data postgres
