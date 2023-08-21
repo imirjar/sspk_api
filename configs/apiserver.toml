@@ -2,3 +2,4 @@ bind_addr = ":8080"
 log_level = "debug"
 database_url = "host=localhost dbname=restapi_dev user=user password=secret sslmode=disable"
 #docker run --rm -e POSTGRES_PASSWORD=secret -e POSTGRES_USER=user -e POSTGRES_DB=restapi_dev --name=pg -p 5432:5432 -v pgdb:/var/lib/postgresql/data postgres
+sessions_key = "076076a0sd76fasdf0680708756as9df69asd6f075asdf8asdf50876076978609876aasdf7767a6sd9f07667875766967ads6f097696a9sd6f9769768756978698676fasdf876876"

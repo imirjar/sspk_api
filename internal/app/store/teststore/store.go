@@ -1,6 +1,7 @@
 package teststore
 
 import (
+	"github.com/imirjar/api-service/internal/app/model"
 	"github.com/imirjar/api-service/internal/app/store"
 	_ "github.com/lib/pq" // ...
 )
@@ -23,6 +24,7 @@ func (s *Store) User() store.UserRepository {
 
 	s.userRepository = &UserRepository{
 		store: s,
+		users: make(map[int]*model.User),
 	}
 
 	return s.userRepository
