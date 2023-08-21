@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/imirjar/api-service/internal/app/model"
+	"github.com/imirjar/api-service/internal/app/store"
 	"github.com/imirjar/api-service/internal/app/store/teststore"
 	"github.com/stretchr/testify/assert"
 )
@@ -21,7 +22,7 @@ func TestUserRepository_FindByEmail(t *testing.T) {
 	s := teststore.New()
 	email := "user@example.org"
 	_, err := s.User().FindByEmail(email)
-	assert.Error(t, err)
+	assert.EqualError(t, err, store.ErrRecordNotFound.Error())
 
 	u := model.TestUser(t)
 	u.Email = email

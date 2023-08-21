@@ -4,28 +4,29 @@ import (
 	"testing"
 
 	"github.com/imirjar/api-service/internal/app/model"
-	store "github.com/imirjar/api-service/internal/app/store/sqlstore"
+	"github.com/imirjar/api-service/internal/app/store"
+	"github.com/imirjar/api-service/internal/app/store/sqlstore"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestUserRepository_Create(t *testing.T) {
-	db, teardown := store.TestDB(t, databaseURL)
+	db, teardown := sqlstore.TestDB(t, databaseURL)
 	defer teardown("users")
 
-	s := store.New(db)
+	s := sqlstore.New(db)
 	u := model.TestUser(t)
 	assert.NoError(t, s.User().Create(u))
 	assert.NotNil(t, u)
 }
 
 func TestUserRepository_FindByEmail(t *testing.T) {
-	db, teardown := store.TestDB(t, databaseURL)
+	db, teardown := sqlstore.TestDB(t, databaseURL)
 	defer teardown("users")
 
-	s := store.New(db)
+	s := sqlstore.New(db)
 	email := "user@example.org"
 	_, err := s.User().FindByEmail(email)
-	assert.Error(t, err)
+	assert.EqualError(t, err, store.ErrRecordNotFound.Error())
 
 	u := model.TestUser(t)
 	u.Email = email

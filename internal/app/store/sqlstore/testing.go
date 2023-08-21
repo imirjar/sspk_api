@@ -23,5 +23,7 @@ func TestDB(t *testing.T, databaseURL string) (*sql.DB, func(...string)) {
 		if len(tables) > 0 {
 			db.Exec("TRUNCATE %s CASCADE", strings.Join(tables, ", "))
 		}
+
+		db.Close()
 	}
 }

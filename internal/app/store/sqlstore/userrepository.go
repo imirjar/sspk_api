@@ -1,6 +1,11 @@
 package sqlstore
 
-import "github.com/imirjar/api-service/internal/app/model"
+import (
+	"database/sql"
+
+	"github.com/imirjar/api-service/internal/app/model"
+	"github.com/imirjar/api-service/internal/app/store"
+)
 
 // UserRepository ...
 type UserRepository struct {
@@ -35,6 +40,9 @@ func (r *UserRepository) FindByEmail(email string) (*model.User, error) {
 		&u.Email,
 		&u.EncryptedPassword,
 	); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, store.ErrRecordNotFound
+		}
 		return nil, err
 	}
 
