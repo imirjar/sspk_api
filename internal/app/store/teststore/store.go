@@ -3,7 +3,6 @@ package teststore
 import (
 	"github.com/imirjar/api-service/internal/app/model"
 	"github.com/imirjar/api-service/internal/app/store"
-	_ "github.com/lib/pq" // ...
 )
 
 // Store ...
@@ -29,5 +28,3 @@ func (s *Store) User() store.UserRepository {
 
 	return s.userRepository
 }
-
-// store.User().Create()

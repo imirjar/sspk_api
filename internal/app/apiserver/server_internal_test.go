@@ -42,9 +42,9 @@ func TestServer_AuthenticateUser(t *testing.T) {
 	secretKey := []byte("secret")
 	s := newServer(store, sessions.NewCookieStore(secretKey))
 	sc := securecookie.New(secretKey, nil)
-	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	mw := s.authenticateUser(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-	})
+	}))
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -52,7 +52,7 @@ func TestServer_AuthenticateUser(t *testing.T) {
 			req, _ := http.NewRequest(http.MethodGet, "/", nil)
 			cookieStr, _ := sc.Encode(sessionName, tc.cookieValue)
 			req.Header.Set("Cookie", fmt.Sprintf("%s=%s", sessionName, cookieStr))
-			s.authenticateUser(handler).ServeHTTP(rec, req)
+			mw.ServeHTTP(rec, req)
 			assert.Equal(t, tc.expectedCode, rec.Code)
 		})
 	}
@@ -60,7 +60,6 @@ func TestServer_AuthenticateUser(t *testing.T) {
 
 func TestServer_HandleUsersCreate(t *testing.T) {
 	s := newServer(teststore.New(), sessions.NewCookieStore([]byte("secret")))
-
 	testCases := []struct {
 		name         string
 		payload      interface{}
@@ -68,7 +67,7 @@ func TestServer_HandleUsersCreate(t *testing.T) {
 	}{
 		{
 			name: "valid",
-			payload: map[string]string{
+			payload: map[string]interface{}{
 				"email":    "user@example.org",
 				"password": "secret",
 			},
@@ -81,27 +80,29 @@ func TestServer_HandleUsersCreate(t *testing.T) {
 		},
 		{
 			name: "invalid params",
-			payload: map[string]string{
-				"email": "invalid",
+			payload: map[string]interface{}{
+				"email":    "invalid",
+				"password": "short",
 			},
 			expectedCode: http.StatusUnprocessableEntity,
 		},
 	}
+
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			rec := httptest.NewRecorder()
 			b := &bytes.Buffer{}
 			json.NewEncoder(b).Encode(tc.payload)
-			req, _ := http.NewRequest(http.MethodPost, "/users", b)
+			rec := httptest.NewRecorder()
+			req, _ := http.NewRequest(http.MethodPost, "/signup", b)
 			s.ServeHTTP(rec, req)
 			assert.Equal(t, tc.expectedCode, rec.Code)
 		})
 	}
 }
 
-func TestServer_HanleSessionsCreate(t *testing.T) {
-	u := model.TestUser(t)
+func TestServer_HandleSessionsCreate(t *testing.T) {
 	store := teststore.New()
+	u := model.TestUser(t)
 	store.User().Create(u)
 	s := newServer(store, sessions.NewCookieStore([]byte("secret")))
 	testCases := []struct {
@@ -111,7 +112,7 @@ func TestServer_HanleSessionsCreate(t *testing.T) {
 	}{
 		{
 			name: "valid",
-			payload: map[string]string{
+			payload: map[string]interface{}{
 				"email":    u.Email,
 				"password": u.Password,
 			},
@@ -124,7 +125,7 @@ func TestServer_HanleSessionsCreate(t *testing.T) {
 		},
 		{
 			name: "invalid email",
-			payload: map[string]string{
+			payload: map[string]interface{}{
 				"email":    "invalid",
 				"password": u.Password,
 			},
@@ -132,19 +133,20 @@ func TestServer_HanleSessionsCreate(t *testing.T) {
 		},
 		{
 			name: "invalid password",
-			payload: map[string]string{
+			payload: map[string]interface{}{
 				"email":    u.Email,
 				"password": "invalid",
 			},
 			expectedCode: http.StatusUnauthorized,
 		},
 	}
+
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			rec := httptest.NewRecorder()
 			b := &bytes.Buffer{}
 			json.NewEncoder(b).Encode(tc.payload)
-			req, _ := http.NewRequest(http.MethodPost, "/sessions", b)
+			rec := httptest.NewRecorder()
+			req, _ := http.NewRequest(http.MethodPost, "/signin", b)
 			s.ServeHTTP(rec, req)
 			assert.Equal(t, tc.expectedCode, rec.Code)
 		})

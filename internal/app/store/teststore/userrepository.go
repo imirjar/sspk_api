@@ -44,5 +44,6 @@ func (r *UserRepository) FindByEmail(email string) (*model.User, error) {
 			return u, nil
 		}
 	}
+
 	return nil, store.ErrRecordNotFound
 }
