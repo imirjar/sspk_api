@@ -60,6 +60,9 @@ func (s *server) configureRouter() {
 	s.router.HandleFunc("/signup", s.handleUsersCreate()).Methods("POST")
 	s.router.HandleFunc("/signin", s.handleSessionsCreate()).Methods("POST")
 
+	//reports service
+	s.router.HandleFunc("/reports", s.handleSessionsCreate()).Methods("POST")
+
 	private := s.router.PathPrefix("/private").Subrouter()
 	private.Use(s.authenticateUser)
 	private.HandleFunc("/whoami", s.handleWhoami())
@@ -130,8 +133,11 @@ func (s *server) authenticateUser(next http.Handler) http.Handler {
 
 func (s *server) handleUsersCreate() http.HandlerFunc {
 	type request struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
+		Email      string `json:"email"`
+		Password   string `json:"password"`
+		Username   string `json:"username"`
+		Surname    string `json:"surname"`
+		Patronymic string `json:"patronymic"`
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -142,9 +148,13 @@ func (s *server) handleUsersCreate() http.HandlerFunc {
 		}
 
 		u := &model.User{
-			Email:    req.Email,
-			Password: req.Password,
+			Email:      req.Email,
+			Password:   req.Password,
+			Username:   req.Username,
+			Surname:    req.Surname,
+			Patronymic: req.Patronymic,
 		}
+
 		if err := s.store.User().Create(u); err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 			return

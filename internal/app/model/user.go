@@ -9,7 +9,7 @@ import (
 // User ...
 type User struct {
 	ID                int    `json:"id"`
-	Name              string `json:"name"`
+	Username          string `json:"name"`
 	Surname           string `json:"surname"`
 	Patronymic        string `json:"patronymic"`
 	Email             string `json:"email"`
@@ -23,6 +23,9 @@ func (u *User) Validate() error {
 		u,
 		validation.Field(&u.Email, validation.Required, is.Email),
 		validation.Field(&u.Password, validation.By(requiredIf(u.EncryptedPassword == "")), validation.Length(6, 100)),
+		validation.Field(&u.Username),
+		validation.Field(&u.Surname),
+		validation.Field(&u.Patronymic),
 	)
 }
 
