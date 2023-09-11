@@ -2,6 +2,7 @@ package apiserver
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
 
 	"github.com/gorilla/sessions"
@@ -19,6 +20,7 @@ func Start(config *Config) error {
 	sessionStore := sessions.NewCookieStore([]byte(config.SessionKey))
 	srv := newServer(store, sessionStore)
 
+	fmt.Println("Server started on port ", config.BindAddr)
 	return http.ListenAndServe(config.BindAddr, srv)
 }
 

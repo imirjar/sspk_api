@@ -29,6 +29,7 @@ func (u *User) Validate() error {
 	)
 }
 
+// вот сюда можно добавить авторизацию в ad
 // Before create ...
 func (u *User) BeforeCreate() error {
 	if len(u.Password) > 0 {

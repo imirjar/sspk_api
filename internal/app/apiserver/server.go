@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
 	"time"
 
@@ -11,9 +12,11 @@ import (
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
+	"github.com/imirjar/api-service/internal/app/grpc/reports"
 	"github.com/imirjar/api-service/internal/app/model"
 	"github.com/imirjar/api-service/internal/app/store"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/grpc"
 )
 
 const (
@@ -56,12 +59,12 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (s *server) configureRouter() {
 	s.router.Use(s.setRequestID)
 	s.router.Use(s.logRequest)
-	s.router.Use(handlers.CORS(handlers.AllowedOrigins([]string{"*", "http://0.0.0.0:3000"})))
+	s.router.Use(handlers.CORS(handlers.AllowedOrigins([]string{"*", "http://0.0.0.0:3000", "http://0.0.0.0:8081"})))
 	s.router.HandleFunc("/signup", s.handleUsersCreate()).Methods("POST")
 	s.router.HandleFunc("/signin", s.handleSessionsCreate()).Methods("POST")
 
 	//reports service
-	s.router.HandleFunc("/reports", s.handleSessionsCreate()).Methods("POST")
+	s.router.HandleFunc("/fake", s.handleFakeCreate())
 
 	private := s.router.PathPrefix("/private").Subrouter()
 	private.Use(s.authenticateUser)
@@ -162,6 +165,32 @@ func (s *server) handleUsersCreate() http.HandlerFunc {
 
 		u.Sanitize()
 		s.respond(w, r, http.StatusCreated, u)
+	}
+}
+
+func (s *server) handleFakeCreate() http.HandlerFunc {
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		conn, err := grpc.Dial("localhost:8081", grpc.WithInsecure())
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		c := reports.NewAdderClient(conn)
+		res, err := c.Add(context.Background(), &reports.AddRequest{X: int32(5), Y: int32(5)})
+		if err != nil {
+			log.Fatal("Ошибка подключения", err)
+		}
+
+		// req := &request{}
+		// if err := json.NewDecoder(r.Body).Decode(req); err != nil {
+		// 	s.error(w, r, http.StatusBadRequest, err)
+		// 	return
+		// }
+
+		log.Println(res.GetResult())
+
+		s.respond(w, r, http.StatusOK, res.GetResult())
 	}
 }
 
