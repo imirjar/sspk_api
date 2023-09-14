@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -61,6 +62,8 @@ func (s *server) configureRouter() {
 	s.router.HandleFunc("/signin", s.handleSessionsCreate()).Methods("POST")
 
 	//reports service
+	// s.router.HandleFunc("/report/{id}", s.handleReport())
+	s.router.HandleFunc("/reports/id", s.handleReport())
 	s.router.HandleFunc("/reports", s.handleReports())
 
 	private := s.router.PathPrefix("/private").Subrouter()
@@ -197,6 +200,37 @@ func (s *server) handleReports() http.HandlerFunc {
 			return
 		}
 		s.respond(w, r, http.StatusOK, reports)
+	}
+}
+
+func (s *server) handleReport() http.HandlerFunc {
+	type Report struct {
+		Name string `json:"name"`
+		Data string `json:"data"`
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("#####1###")
+		report := &Report{}
+
+		// vars := mux.Vars(r)
+
+		req, err := http.NewRequest(http.MethodGet, "http://localhost:8081/id", nil)
+		if err != nil {
+			s.error(w, r, http.StatusBadRequest, err) //client: could not create request
+			return
+			// s.respond(w, r, http.StatusBadGateway, err)
+			// return
+		}
+		fmt.Println("#####2###")
+		res, err := http.DefaultClient.Do(req)
+
+		if err := json.NewDecoder(res.Body).Decode(report); err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+		fmt.Println("#####3###")
+		s.respond(w, r, http.StatusOK, report)
 	}
 }
 
