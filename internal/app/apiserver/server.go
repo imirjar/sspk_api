@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -204,13 +203,15 @@ func (s *server) handleReports() http.HandlerFunc {
 }
 
 func (s *server) handleReport() http.HandlerFunc {
+	type Data interface{}
+
 	type Report struct {
 		Name string `json:"name"`
-		Data string `json:"data"`
+		Data []Data `json:"data"`
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println("#####1###")
+
 		report := &Report{}
 
 		// vars := mux.Vars(r)
@@ -222,14 +223,14 @@ func (s *server) handleReport() http.HandlerFunc {
 			// s.respond(w, r, http.StatusBadGateway, err)
 			// return
 		}
-		fmt.Println("#####2###")
+
 		res, err := http.DefaultClient.Do(req)
 
 		if err := json.NewDecoder(res.Body).Decode(report); err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
 			return
 		}
-		fmt.Println("#####3###")
+
 		s.respond(w, r, http.StatusOK, report)
 	}
 }
