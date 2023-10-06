@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -64,6 +65,7 @@ func (s *server) configureRouter() {
 	// s.router.HandleFunc("/report/{id}", s.handleReport())
 	s.router.HandleFunc("/reports/id", s.handleReport())
 	s.router.HandleFunc("/reports", s.handleReports())
+	s.router.HandleFunc("/categories", s.handleCategories())
 
 	private := s.router.PathPrefix("/private").Subrouter()
 	private.Use(s.authenticateUser)
@@ -199,6 +201,34 @@ func (s *server) handleReports() http.HandlerFunc {
 			return
 		}
 		s.respond(w, r, http.StatusOK, reports)
+	}
+}
+
+func (s *server) handleCategories() http.HandlerFunc {
+
+	type Category struct {
+		Name string `json:"name"`
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		var categories []Category
+
+		req, err := http.NewRequest(http.MethodGet, "http://localhost:8081/categories", nil)
+		if err != nil {
+			s.error(w, r, http.StatusBadRequest, err) //client: could not create request
+			return
+			// s.respond(w, r, http.StatusBadGateway, err)
+			// return
+		}
+
+		res, err := http.DefaultClient.Do(req)
+
+		if err := json.NewDecoder(res.Body).Decode(categories); err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+			fmt.Printf("2", err)
+			return
+		}
+		s.respond(w, r, http.StatusOK, categories)
 	}
 }
 
