@@ -171,22 +171,15 @@ func (s *server) handleUsersCreate() http.HandlerFunc {
 
 func (s *server) handleReports() http.HandlerFunc {
 	type Report struct {
-		Name string `json:"name"`
-	}
-
-	type Category struct {
-		Name    string   `json:"name"`
-		Reports []Report `json:"reports"`
-	}
-
-	type Reports struct {
-		Categories []Category `json:"categories"`
+		Name     string `json:"Name"`
+		Category string `json:"Category"`
+		Query    string `json:"Query"`
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		reports := &Reports{}
+		var reports []Report
 
-		req, err := http.NewRequest(http.MethodGet, "http://localhost:8081", nil)
+		req, err := http.NewRequest(http.MethodGet, "http://localhost:8081/", nil)
 		if err != nil {
 			s.error(w, r, http.StatusBadRequest, err) //client: could not create request
 			return
@@ -196,7 +189,7 @@ func (s *server) handleReports() http.HandlerFunc {
 
 		res, err := http.DefaultClient.Do(req)
 
-		if err := json.NewDecoder(res.Body).Decode(reports); err != nil {
+		if err := json.NewDecoder(res.Body).Decode(&reports); err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
 			return
 		}
@@ -207,7 +200,7 @@ func (s *server) handleReports() http.HandlerFunc {
 func (s *server) handleCategories() http.HandlerFunc {
 
 	type Category struct {
-		Name string `json:"name"`
+		Name string `json:"Name"`
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -223,7 +216,7 @@ func (s *server) handleCategories() http.HandlerFunc {
 
 		res, err := http.DefaultClient.Do(req)
 
-		if err := json.NewDecoder(res.Body).Decode(categories); err != nil {
+		if err := json.NewDecoder(res.Body).Decode(&categories); err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
 			fmt.Printf("2", err)
 			return
