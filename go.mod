@@ -1,4 +1,4 @@
-module github.com/imirjar/api-service
+module github.com/imirjar/rb-auth
 
 go 1.21
 

@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/sessions"
-	"github.com/imirjar/api-service/internal/app/store/sqlstore"
+	"github.com/imirjar/rb-auth/internal/app/store/sqlstore"
 )
 
 func Start(config *Config) error {

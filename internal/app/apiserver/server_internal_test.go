@@ -10,8 +10,8 @@ import (
 
 	"github.com/gorilla/securecookie"
 	"github.com/gorilla/sessions"
-	"github.com/imirjar/api-service/internal/app/model"
-	"github.com/imirjar/api-service/internal/app/store/teststore"
+	"github.com/imirjar/rb-auth/internal/app/model"
+	"github.com/imirjar/rb-auth/internal/app/store/teststore"
 	"github.com/stretchr/testify/assert"
 )
 

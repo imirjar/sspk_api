@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"github.com/BurntSushi/toml"
-	"github.com/imirjar/api-service/internal/app/apiserver"
+	"github.com/imirjar/rb-auth/internal/app/apiserver"
 )
 
 var (

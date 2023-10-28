@@ -1,6 +1,6 @@
 package store
 
-import "github.com/imirjar/api-service/internal/app/model"
+import "github.com/imirjar/rb-auth/internal/app/model"
 
 // UserRepository ...
 type UserRepository interface {

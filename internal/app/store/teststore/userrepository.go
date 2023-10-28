@@ -1,8 +1,8 @@
 package teststore
 
 import (
-	"github.com/imirjar/api-service/internal/app/model"
-	"github.com/imirjar/api-service/internal/app/store"
+	"github.com/imirjar/rb-auth/internal/app/model"
+	"github.com/imirjar/rb-auth/internal/app/store"
 )
 
 // UserRepository ...

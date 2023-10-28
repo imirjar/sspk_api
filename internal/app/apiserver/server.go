@@ -12,8 +12,8 @@ import (
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
-	"github.com/imirjar/api-service/internal/app/model"
-	"github.com/imirjar/api-service/internal/app/store"
+	"github.com/imirjar/rb-auth/internal/app/model"
+	"github.com/imirjar/rb-auth/internal/app/store"
 	"github.com/sirupsen/logrus"
 )
 

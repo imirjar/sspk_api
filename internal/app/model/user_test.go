@@ -3,7 +3,7 @@ package model_test
 import (
 	"testing"
 
-	"github.com/imirjar/api-service/internal/app/model"
+	"github.com/imirjar/rb-auth/internal/app/model"
 	"github.com/stretchr/testify/assert"
 )
 
